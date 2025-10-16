@@ -3,46 +3,48 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - master  # Пайплайн будет запускаться при пуше в основную ветку (main)
+      - main
   pull_request:
     branches:
-      - master  # Пайплайн также будет запускаться при открытии pull request'а на main
+      - main
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # Клонируем репозиторий
+        uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'  # Указываем версию Python
+          python-version: '3.11'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt  # Устанавливаем зависимости из requirements-dev.txt
+          pip install -r requirements-dev.txt
       - name: Run Ruff (Linter)
-        run: ruff check .  # Запускаем линтинг с помощью ruff
+        run: ruff check .
 
   test:
     runs-on: ubuntu-latest
-    needs: lint  # Job 'test' будет выполняться только после успешного завершения 'lint'
+    needs: lint
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # Клонируем репозиторий
+        uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'  # Указываем версию Python
+          python-version: '3.11'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt  # Устанавливаем зависимости
+          pip install -r requirements-dev.txt
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV  # Добавляем путь к проекту
       - name: Run Tests
-        run: pytest -q --junitxml=report.xml  # Запускаем тесты и генерируем отчёт в формате JUnit
+        run: pytest -q --junitxml=report.xml
       - name: Upload Test Reports
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
-          path: report.xml  # Загружаем отчёт о тестах как артефакт
+          path: report.xml
