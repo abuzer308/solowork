@@ -42,7 +42,7 @@ jobs:
       - name: Run Tests
         run: pytest -q --junitxml=report.xml  # Запускаем тесты и генерируем отчёт в формате JUnit
       - name: Upload Test Reports
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: test-reports
           path: report.xml  # Загружаем отчёт о тестах как артефакт
